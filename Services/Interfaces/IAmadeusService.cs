@@ -13,7 +13,55 @@ namespace RouteWise.Services.Interfaces
             int? duration = null,
             bool? nonStop = null);
 
-        Task<FlightSearchResponseV2> FlightSearchWithLayovers(
-            string origin, int duration, int minLayoverDuration);
+        Task<SimpleFlightOffersResponse> FlightSearchV2(
+            string origin,
+            string? destination,
+            int? minLayoverDuration,
+            int adults,
+            int max,
+            int? stops,
+            int resultLimit = 10,
+            string? userDepartureDate = null,
+            string? userReturnDate = null
+        );
+
+        Task<SimpleFlightOffersResponse> FlightSearchByDayOfWeekForMonthOptimized(
+            string origin,
+            string? destination,
+            int year,
+            int month,
+            DayOfWeek departureDayOfWeek,
+            DayOfWeek returnDayOfWeek,
+            int adults,
+            int max, // Each call can fetch up to this many
+            int? minLayoverDuration = null,
+            int? layovers = null,
+            int resultLimit = 10 // Final total limit
+        );
+
+        Task<SimpleFlightOffersResponse> FlightSearchByMonth(
+            string origin,
+            string? destination,
+            int year,
+            int month,
+            int adults,
+            int max,
+            int? minLayoverDuration,
+            int? stops,
+            int resultLimit = 10
+        );
+
+        Task<SimpleFlightOffersResponse> FlightSearchByDuration(
+            string origin,
+            string? destination,
+            int durationDays,
+            int adults,
+            int max,
+            int? minLayoverDuration,
+            int? stops,
+            int resultLimit = 10
+        );
+
+        Task<FlightSearchResponseV2> MultiCityFlightSearch(MultiCitySearchRequest request);
     }
 }
