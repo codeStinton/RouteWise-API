@@ -51,6 +51,7 @@ namespace RouteWise.Controllers
             // Shared filter params
             [FromQuery] int? minLayoverDuration = null,
             [FromQuery] int? layovers = null,
+            [FromQuery] int? maxPrice = null,
             [FromQuery] int adults = 1,
             [FromQuery] int max = 50,
             [FromQuery] int resultLimit = 10,
@@ -78,6 +79,7 @@ namespace RouteWise.Controllers
                     max,
                     minLayoverDuration,
                     layovers,
+                    maxPrice,
                     resultLimit
                 );
             }
@@ -94,6 +96,7 @@ namespace RouteWise.Controllers
                     max,
                     minLayoverDuration,
                     layovers,
+                    maxPrice,
                     resultLimit
                 );
             }
@@ -109,6 +112,7 @@ namespace RouteWise.Controllers
                     max,
                     minLayoverDuration,
                     layovers,
+                    maxPrice,
                     resultLimit
                 );
             }
@@ -123,6 +127,7 @@ namespace RouteWise.Controllers
                     adults,
                     max,
                     layovers,
+                    maxPrice,
                     resultLimit,
                     departureDate,
                     returnDate
@@ -140,6 +145,7 @@ namespace RouteWise.Controllers
                     adults,
                     max,
                     layovers,
+                    maxPrice,
                     resultLimit
                 );
             }

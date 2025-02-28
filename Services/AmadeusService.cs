@@ -91,6 +91,7 @@ namespace RouteWise.Services
             int adults,
             int max,
             int? stops,
+            int? maxPrice = null,
             int resultLimit = 10,
             string? userDepartureDate = null,
             string? userReturnDate = null
@@ -99,7 +100,7 @@ namespace RouteWise.Services
             // 1) Build a more complete cache key so changing these inputs triggers a new search.
             string baseKey = $"Explore_Base_{origin}_{adults}_{max}_{resultLimit}" +
                              $"_dep_{userDepartureDate ?? "NONE"}_ret_{userReturnDate ?? "NONE"}" +
-                             $"_lay_{stops ?? -1}_minLay_{minLayoverDuration ?? -1}";
+                             $"_lay_{stops ?? -1}_minLay_{minLayoverDuration ?? -1}_maxPrice_{maxPrice ?? -1}";
 
             // 2) Check cache
             if (!_cache.TryGetValue(baseKey, out List<FlightOffer>? validFlightsSoFar))
@@ -138,7 +139,8 @@ namespace RouteWise.Services
                         returnDateToUse,
                         token,
                         adults,
-                        max
+                        max,
+                        maxPrice
                     );
 
                     // Immediately filter flights for layover or stops
@@ -198,6 +200,7 @@ namespace RouteWise.Services
             int max, // Each call can fetch up to this many
             int? minLayoverDuration = null,
             int? layovers = null,
+            int? maxPrice = null,
             int resultLimit = 10 // Final total limit
         )
         {
@@ -205,7 +208,7 @@ namespace RouteWise.Services
             var endDate = new DateTime(year, month, DateTime.DaysInMonth(year, month));
 
             // Example cache key
-            string cacheKey = $"Optimized_{origin}_{destination}_{year}_{month}_{departureDayOfWeek}_{returnDayOfWeek}_{adults}_{max}_{minLayoverDuration}_{layovers}_{resultLimit}";
+            string cacheKey = $"Optimized_{origin}_{destination}_{year}_{month}_{departureDayOfWeek}_{returnDayOfWeek}_{adults}_{max}_{minLayoverDuration}_{layovers}_{maxPrice}_{resultLimit}";
             if (_cache.TryGetValue(cacheKey, out SimpleFlightOffersResponse cached))
             {
                 return cached;
@@ -247,7 +250,8 @@ namespace RouteWise.Services
                             returnDate.ToString("yyyy-MM-dd"),
                             token,
                             adults,
-                            max
+                            max,
+                            maxPrice
                         );
 
                         // Filter them right away
@@ -272,7 +276,8 @@ namespace RouteWise.Services
                         returnDate.ToString("yyyy-MM-dd"),
                         token,
                         adults,
-                        max
+                        max,
+                        maxPrice
                     );
 
                     // Filter them right away
@@ -317,14 +322,15 @@ namespace RouteWise.Services
             int max,
             int? minLayoverDuration,
             int? stops,
+            int? maxPrice,
             int resultLimit = 10
         )
         {
             // 1) Build a cache key that includes 'destination' (or an indication of null)
             string destKeyPart = string.IsNullOrEmpty(destination) ? "ALLDEST" : destination;
             string baseKey = $"MonthSearch_{origin}_{destKeyPart}_{year}_{month}" +
-                             $"_adults_{adults}_max_{max}_res_{resultLimit}" +
-                             $"_stops_{stops ?? -1}_minLay_{minLayoverDuration ?? -1}";
+                     $"_adults_{adults}_max_{max}_res_{resultLimit}" +
+                     $"_stops_{stops ?? -1}_minLay_{minLayoverDuration ?? -1}_maxPrice_{maxPrice ?? -1}";
 
             if (!_cache.TryGetValue(baseKey, out List<FlightOffer>? validFlightsSoFar))
             {
@@ -375,7 +381,8 @@ namespace RouteWise.Services
                             null,
                             token,
                             adults,
-                            max
+                            max,
+                            maxPrice
                         );
 
                         // Immediately filter flights
@@ -418,14 +425,16 @@ namespace RouteWise.Services
              int max,
              int? minLayoverDuration,
              int? stops,
+             int? maxPrice,
              int resultLimit = 10
          )
         {
             // 1) Cache key that includes 'destination' or "ALLDEST"
             string destKeyPart = string.IsNullOrEmpty(destination) ? "ALLDEST" : destination;
             string baseKey = $"DurSearch_{origin}_{destKeyPart}_dur_{durationDays}" +
-                             $"_adults_{adults}_max_{max}_res_{resultLimit}" +
-                             $"_stops_{stops ?? -1}_minLay_{minLayoverDuration ?? -1}";
+                     $"_adults_{adults}_max_{max}_res_{resultLimit}" +
+                     $"_stops_{stops ?? -1}_minLay_{minLayoverDuration ?? -1}_maxPrice_{maxPrice ?? -1}";
+
 
             if (!_cache.TryGetValue(baseKey, out List<FlightOffer>? validFlightsSoFar))
             {
@@ -472,7 +481,8 @@ namespace RouteWise.Services
                             retStr,   // round-trip for 'durationDays'
                             token,
                             adults,
-                            max
+                            max,
+                            maxPrice
                         );
 
                         // Filter them
@@ -576,7 +586,8 @@ namespace RouteWise.Services
               string? returnDate,
               string token,
               int adults,
-              int max
+              int max,
+              int? maxPrice
           )
         {
             var url = AmadeusEndpoints.FlightOffersEndpoint
@@ -589,6 +600,11 @@ namespace RouteWise.Services
             if (!string.IsNullOrWhiteSpace(returnDate))
             {
                 url += $"&returnDate={returnDate}";
+            }
+
+            if (maxPrice.HasValue)
+            {
+                url += $"&maxPrice={maxPrice.Value}";
             }
 
             using var request = new HttpRequestMessage(HttpMethod.Get, url);

@@ -20,6 +20,7 @@ namespace RouteWise.Services.Interfaces
             int adults,
             int max,
             int? stops,
+            int? maxPrice = null,
             int resultLimit = 10,
             string? userDepartureDate = null,
             string? userReturnDate = null
@@ -36,6 +37,7 @@ namespace RouteWise.Services.Interfaces
             int max, // Each call can fetch up to this many
             int? minLayoverDuration = null,
             int? layovers = null,
+            int? maxPrice = null,
             int resultLimit = 10 // Final total limit
         );
 
@@ -48,6 +50,7 @@ namespace RouteWise.Services.Interfaces
             int max,
             int? minLayoverDuration,
             int? stops,
+            int? maxPrice = null,
             int resultLimit = 10
         );
 
@@ -59,6 +62,7 @@ namespace RouteWise.Services.Interfaces
             int max,
             int? minLayoverDuration,
             int? stops,
+            int? maxPrice = null,
             int resultLimit = 10
         );
 
