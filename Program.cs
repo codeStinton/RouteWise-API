@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<AmadeusSettings>(builder.Configuration.GetSection("Amadeus"));
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpClient();
-builder.Services.AddScoped<IAmadeusService, AmadeusService>();
+builder.Services.AddScoped<IV1FlightSearchService, FlightSearchServiceV1>();
 builder.Services.AddScoped<IAuthentication, Authentication>();
 
 builder.Services.AddControllers().AddJsonOptions(options =>
