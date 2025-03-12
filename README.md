@@ -2,7 +2,7 @@
  
 ## Overview
 
-RouteWise is a flight search API that integrates with Amadeus to provide flight offers, multi-city searches, and destination exploration.
+RouteWise is a highly customizable flight search API that integrates with [Amadeus](https://developers.amadeus.com/) to provide flight offers, multi-city searches, and destination exploration.
 
 ## Features
 
