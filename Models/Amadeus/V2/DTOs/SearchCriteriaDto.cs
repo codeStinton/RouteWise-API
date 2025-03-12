@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using RouteWise.Controllers.Defaults;
+using System.ComponentModel.DataAnnotations;
 
 namespace RouteWise.Models.Amadeus.V2.DTOs
 {
@@ -8,6 +9,6 @@ namespace RouteWise.Models.Amadeus.V2.DTOs
         /// Maximum number of flight offers to return.
         /// </summary>
         [Range(1, 50)]
-        public int MaxFlightOffers { get; set; } = 5;
+        public int MaxFlightOffers { get; set; } = FlightSearchDefaults.TotalResultLimit;
     }
 }

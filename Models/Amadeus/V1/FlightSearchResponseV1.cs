@@ -2,7 +2,10 @@
 
 namespace RouteWise.Models.Amadeus.V1
 {
-    public class FlightSearchResponse
+    /// <summary>
+    /// Gets or sets the list of Flight Search response data
+    /// </summary>
+    public class FlightSearchResponseV1
     {
         [JsonPropertyName("data")]
         public List<FlightDestination> Data { get; set; } = new();

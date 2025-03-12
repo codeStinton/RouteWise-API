@@ -1,3 +1,4 @@
+using RouteWise.Middleware;
 using RouteWise.Models.Amadeus;
 using RouteWise.Services;
 using RouteWise.Services.Interfaces;
@@ -6,9 +7,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<AmadeusSettings>(builder.Configuration.GetSection("Amadeus"));
 builder.Services.AddMemoryCache();
-builder.Services.AddHttpClient();
-builder.Services.AddScoped<IV1FlightSearchService, FlightSearchServiceV1>();
-builder.Services.AddScoped<IAuthentication, Authentication>();
+builder.Services.AddHttpClient<IAuthentication, Authentication>();
+builder.Services.AddHttpClient<IFlightSearchServiceV1, FlightSearchServiceV1>();
+builder.Services.AddHttpClient<IFlightSearchServiceV2, FlightSearchServiceV2>();
+builder.Services.AddHttpClient<IMultiCityServiceV2, MultiCityServiceV2>();
+
+builder.Services.AddSingleton<IAuthentication, Authentication>();
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
@@ -30,6 +34,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseExceptionHandlingMiddleware();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();

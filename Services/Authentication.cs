@@ -1,38 +1,66 @@
-﻿using System.Text;
+﻿using System.Net.Http;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RouteWise.Models.Amadeus;
 using RouteWise.Services.Endpoints;
 using RouteWise.Services.Interfaces;
+using RouteWise.Exceptions;
+using Microsoft.Extensions.Caching.Memory;
+using RouteWise.Caching;
 
 namespace RouteWise.Services
 {
     public class Authentication : IAuthentication
     {
+        private readonly IMemoryCache _cache;
         private readonly HttpClient _httpClient;
         private readonly AmadeusSettings _settings;
+        private readonly JsonSerializerOptions _jsonOptions;
 
-        public Authentication(HttpClient httpClient, IOptions<AmadeusSettings> settings)
+        public Authentication(IMemoryCache cache, HttpClient httpClient, IOptions<JsonSerializerOptions> jsonOptions, IOptions<AmadeusSettings> settings)
         {
+            _cache = cache;
             _httpClient = httpClient;
             _settings = settings.Value;
+            _jsonOptions = jsonOptions.Value;
         }
 
-        public async Task<string> GetAccessTokenAsync()
+        /// <inheritdoc/>
+        public async Task<string> GetOrRefreshAccessToken(CancellationToken cancellationToken = default)
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, AmadeusEndpoints.AuthenticationEndpoint);
-            var content = new StringContent(
-                $"grant_type=client_credentials&client_id={_settings.ClientId}&client_secret={_settings.ClientSecret}",
-                Encoding.UTF8, "application/x-www-form-urlencoded"
-            );
-            request.Content = content;
+            return await _cache.GetOrCreateWithEntryAsync("AccessToken", async entry =>
+            {
+                var parameters = new Dictionary<string, string>
+                {
+                    { "grant_type", "client_credentials" },
+                    { "client_id", _settings.ClientId },
+                    { "client_secret", _settings.ClientSecret }
+                };
 
-            var response = await _httpClient.SendAsync(request);
-            response.EnsureSuccessStatusCode();
+                using var content = new FormUrlEncodedContent(parameters);
+                var response = await _httpClient.PostAsync(AmadeusEndpoints.AuthenticationEndpoint, content, cancellationToken).ConfigureAwait(false);
 
-            var responseContent = await response.Content.ReadAsStringAsync();
-            using var doc = JsonDocument.Parse(responseContent);
-            return doc.RootElement.GetProperty("access_token").GetString()!;
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
+                    throw new AuthenticationException($"Authentication failed with status code {response.StatusCode}: {errorContent}");
+                }
+
+                var responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
+                var authResponse = JsonSerializer.Deserialize<AuthenticationResponse>(responseContent, _jsonOptions)
+                                   ?? throw new AuthenticationException("Failed to deserialize authentication response.");
+
+                // Verify that the token has been approved.
+                if (!string.Equals(authResponse.State, "approved", StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new AuthenticationException($"Authentication not approved: {authResponse.State}");
+                }
+
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(authResponse.ExpiresIn - 30);
+
+                return authResponse.AccessToken;
+            });
         }
     }
 }

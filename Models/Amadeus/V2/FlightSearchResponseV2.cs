@@ -2,6 +2,9 @@
 
 namespace RouteWise.Models.Amadeus.V2
 {
+    /// <summary>
+    /// Gets or sets the list of Flight Search response data
+    /// </summary>
     public class FlightSearchResponseV2
     {
         [JsonPropertyName("meta")]

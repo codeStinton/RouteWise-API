@@ -1,24 +1,18 @@
-﻿using RouteWise.Models.Amadeus.V2;
+﻿using RouteWise.DTOs.V2;
+using RouteWise.Models.Amadeus.V2;
 
 namespace RouteWise.Services.Interfaces
 {
     public interface IFlightSearchServiceV2
     {
-        Task<SimpleFlightOffersResponse> FlightSearch(
-            string origin,
-            string? destination,
-            int? year,
-            int? month,
-            DayOfWeek? departureDayOfWeek,
-            DayOfWeek? returnDayOfWeek,
-            int? durationDays,
-            string? explicitDepartureDate,
-            string? explicitReturnDate,
-            int? minLayoverDuration,
-            int? layovers,
-            int? maxPrice,
-            int adults,
-            int max,
-            int resultLimit);
+        /// <summary>
+        /// Performs a flight search based on the given request parameters and returns a list of formatted flight offers.
+        /// </summary>
+        /// <param name="request">The flight search request containing search parameters.</param>
+        /// <param name="cancellationToken">An optional cancellation token to cancel the operation.</param>
+        /// <returns>
+        /// A task that represents the asynchronous operation. The task result contains a list of formatted flight offers.
+        /// </returns>
+        Task<List<FormattedFlightOffer>> FlightSearch(FlightSearchRequestV2 request, CancellationToken cancellationToken = default);
     }
 }

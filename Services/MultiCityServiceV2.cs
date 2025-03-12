@@ -1,30 +1,52 @@
 ﻿using System.Text;
 using System.Text.Json;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
+using RouteWise.Caching;
+using RouteWise.DTOs.V2;
+using RouteWise.Exceptions;
+using RouteWise.Models.Amadeus;
 using RouteWise.Models.Amadeus.V2;
+using RouteWise.Services.Endpoints;
+using RouteWise.Services.Helpers;
 using RouteWise.Services.Interfaces;
+using CacheExtensions = RouteWise.Caching.CacheExtensions;
 
 namespace RouteWise.Services
 {
     public class MultiCityServiceV2 : IMultiCityServiceV2
     {
+        private readonly IMemoryCache _cache;
         private readonly HttpClient _httpClient;
         private readonly IAuthentication _authentication;
         private readonly JsonSerializerOptions _jsonOptions;
+        private readonly int _cacheDurationMinutes;
 
-        public MultiCityServiceV2(HttpClient httpClient, IAuthentication authentication)
+        public MultiCityServiceV2(MemoryCache cache, HttpClient httpClient, IAuthentication authentication, IOptions<JsonSerializerOptions> jsonOptions, IOptions<AmadeusSettings> options)
         {
+            _cache = cache;
             _httpClient = httpClient;
             _authentication = authentication;
-            _jsonOptions = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
+            _jsonOptions = jsonOptions.Value;
+            _cacheDurationMinutes = options.Value.CacheDurationInMinutes;
         }
 
-        public async Task<FlightSearchResponseV2> MultiCityFlightSearch(MultiCitySearchRequest request)
+        /// <inheritdoc/>
+        public async Task<FlightSearchResponseV2> MultiCityFlightSearch(MultiCitySearchRequestV2 request, CancellationToken cancellationToken = default)
         {
-            var token = await _authentication.GetAccessTokenAsync();
+            string cacheKey = CacheExtensions.GenerateCacheKey("MultiCityFlightSearch", request);
 
+            return await _cache.GetOrCreateAsync(cacheKey, TimeSpan.FromMinutes(_cacheDurationMinutes), async () =>
+            {
+                var token = await _authentication.GetOrRefreshAccessToken(cancellationToken);
+                var bodyString = BuildMultiCityRequestBody(request);
+
+                return await _httpClient.PostAsync<FlightSearchResponseV2>(AmadeusEndpoints.FlightOffersEndpoint, token, bodyString, _jsonOptions, cancellationToken);
+            });
+        }
+
+        private static string BuildMultiCityRequestBody(MultiCitySearchRequestV2 request)
+        {
             var requestBody = new
             {
                 originDestinations = request.OriginDestinations.Select((segment, index) => new
@@ -50,22 +72,7 @@ namespace RouteWise.Services
                 }
             };
 
-            var bodyString = JsonSerializer.Serialize(requestBody, _jsonOptions);
-            var url = "https://test.api.amadeus.com/v2/shopping/flight-offers";
-
-            using var httpRequest = new HttpRequestMessage(HttpMethod.Post, url);
-            httpRequest.Headers.Add("Authorization", $"Bearer {token}");
-            httpRequest.Content = new StringContent(bodyString, Encoding.UTF8, "application/json");
-
-            var response = await _httpClient.SendAsync(httpRequest);
-            if (!response.IsSuccessStatusCode)
-            {
-                var errorResponse = await response.Content.ReadAsStringAsync();
-                throw new Exception($"Amadeus API error: {errorResponse}");
-            }
-
-            var responseContent = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<FlightSearchResponseV2>(responseContent, _jsonOptions)!;
+            return JsonSerializer.Serialize(requestBody);
         }
     }
 }

@@ -3,13 +3,13 @@
     public static class FlightSearchDefaults
     {
         /// <summary>
-        /// Default value for minimum layover time in minutes
+        /// Maximum result limit of each API call
         /// </summary>
-        public const int MinimumLayoverMinutes = 120;
+        public const int ApiResultLimit = 50;
 
         /// <summary>
-        /// Default value for duration between origin and return flight in days
+        /// Maximum overall result returned
         /// </summary>
-        public const int DurationDays = 7;
+        public const int TotalResultLimit = 10;
     }
 }
