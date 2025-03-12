@@ -1,9 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using RouteWise.Models.Amadeus;
+﻿using RouteWise.Models.Amadeus;
 using System.ComponentModel.DataAnnotations;
-using System.Net;
 using System.Text.Json;
 
 namespace RouteWise.Middleware

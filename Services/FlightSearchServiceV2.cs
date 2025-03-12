@@ -1,10 +1,7 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using System.Text.Json;
-using RouteWise.Models.Amadeus.V1;
 using RouteWise.Models.Amadeus.V2;
-using RouteWise.Services.Endpoints;
 using RouteWise.Services.Interfaces;
-using System.Net;
 using RouteWise.DTOs.V2;
 using Microsoft.Extensions.Options;
 using RouteWise.Models.Amadeus;
@@ -12,7 +9,6 @@ using RouteWise.Caching;
 using CacheExtensions = RouteWise.Caching.CacheExtensions;
 using RouteWise.Services.Helpers;
 using RouteWise.Exceptions;
-using System.Threading;
 
 namespace RouteWise.Services
 {

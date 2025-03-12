@@ -1,6 +1,4 @@
-﻿using System.Net.Http;
-using System.Text.Json;
-using Microsoft.Extensions.Logging;
+﻿using System.Text.Json;
 using Microsoft.Extensions.Options;
 using RouteWise.Models.Amadeus;
 using RouteWise.Services.Endpoints;
