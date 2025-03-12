@@ -20,17 +20,9 @@ RouteWise is a highly customizable flight search API that integrates with [Amade
 
 - Dynamic Date Selection
 
-  - Supports searching by year, month, day of the week, or fixed duration.
-
-  - Automatically builds date pairs based on provided constraints.
-
-- Destination Exploration
-
-  - Find destinations based on price limits, duration, and other parameters.
-
-- Multi-City Search Support
-
-Handles complex travel itineraries across multiple destinations.
+  - Supports searching by year, month, days of the week, or fixed duration.
+ 
+  - Supports searching within day ranges e.g. _Flights with departure on a Friday and return on the Sunday_
 
 - Error Handling Middleware
 
