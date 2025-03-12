@@ -8,13 +8,13 @@ RouteWise is a highly customizable flight search API that integrates with [Amade
 
 - Highly Customizable Flight Searches
 
-  - Supports multiple search criteria, including origin, departure date, and price filtering.
+  - Supports multiple search criteria, including origin, departure date, layover, and price filtering.
 
-- Offers one-way, round-trip, and multi-city flight search options.
+  - Offers one-way, round-trip, and multi-city flight search options.
 
-  - Layover and Stopover Configurations
+- Layover and Stopover Configurations
 
-- Allows customization of layovers, including duration and stop preferences.
+  - Allows customization of layovers, including duration, location, and amount.
 
   - Supports filtering for non-stop flights.
 
