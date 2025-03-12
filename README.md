@@ -6,13 +6,43 @@ RouteWise is a flight search API that integrates with Amadeus to provide flight 
 
 ## Features
 
-- Flight search (single and multi-city)
+- Highly Customizable Flight Searches
 
-- Destination-based flight offers
+  - Supports multiple search criteria, including origin, departure date, and price filtering.
 
-- Exception handling middleware for improved error responses
+- Offers one-way, round-trip, and multi-city flight search options.
 
-- RESTful API with structured JSON responses
+  - Layover and Stopover Configurations
+
+- Allows customization of layovers, including duration and stop preferences.
+
+  - Supports filtering for non-stop flights.
+
+- Dynamic Date Selection
+
+  - Supports searching by year, month, day of the week, or fixed duration.
+
+  - Automatically builds date pairs based on provided constraints.
+
+- Destination Exploration
+
+  - Find destinations based on price limits, duration, and other parameters.
+
+- Multi-City Search Support
+
+Handles complex travel itineraries across multiple destinations.
+
+- Error Handling Middleware
+
+  - Provides structured error responses for better debugging and client-side handling.
+
+- RESTful API with JSON Responses
+
+  - Designed for seamless integration with front-end applications and third-party services.
+
+- Swagger Support
+
+  - Auto-generated API endpoint testing
 
 ## Technologies Used
 
