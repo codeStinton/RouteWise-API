@@ -33,11 +33,12 @@ namespace RouteWise.Services
         {
             string cacheKey = CacheExtensions.GenerateCacheKey("FlightSearchV1", origin, request);
 
+            // Retrieve the cached response if it exists
             return await _cache.GetOrCreateAsync(cacheKey, TimeSpan.FromMinutes(_cacheDurationMinutes), 
                 async () =>
                 {
                     var token = await _authentication.GetOrRefreshAccessToken(cancellationToken);
-                    var url = UrlBuilder.FligthDestinations(origin, request.MaxPrice, request.OneWay, request.DepartureDate, request.Duration, request.NonStop);
+                    var url = Helpers.UriBuilder.FligthDestinations(origin, request.MaxPrice, request.OneWay, request.DepartureDate, request.Duration, request.NonStop);
 
                     return await _httpClient.GetAsync<FlightSearchResponseV1>(url, token, _jsonOptions, cancellationToken);
                 });

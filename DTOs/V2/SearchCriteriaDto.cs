@@ -1,7 +1,7 @@
 ﻿using RouteWise.Controllers.Defaults;
 using System.ComponentModel.DataAnnotations;
 
-namespace RouteWise.Models.Amadeus.V2.DTOs
+namespace RouteWise.DTOs.V2
 {
     public class SearchCriteriaDto
     {

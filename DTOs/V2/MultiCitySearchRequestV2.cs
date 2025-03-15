@@ -1,5 +1,4 @@
-﻿using RouteWise.Models.Amadeus.V2.DTOs;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace RouteWise.DTOs.V2
 {

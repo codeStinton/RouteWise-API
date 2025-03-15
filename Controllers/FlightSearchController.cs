@@ -74,7 +74,7 @@ namespace RouteWise.Controllers
         {
             if (request is null || request.OriginDestinations.Count == 0)
             {
-                return BadRequest("Invalid multi-city request: at least one origin-destination is required");
+                return BadRequest("At least one origin-destination is required");
             }
 
             var result = await _amedeusMultiCityV2.MultiCityFlightSearch(request, cancellationToken);

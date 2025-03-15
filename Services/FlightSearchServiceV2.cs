@@ -20,7 +20,7 @@ namespace RouteWise.Services
         private readonly IAuthentication _authentication;
         private readonly JsonSerializerOptions _jsonOptions;
 
-        public FlightSearchServiceV2(IMemoryCache cache, HttpClient httpClient, IAuthentication authentication, IOptions<JsonSerializerOptions> jsonOptions, IOptions<AmadeusSettings> options)
+        public FlightSearchServiceV2(IMemoryCache cache, HttpClient httpClient, IAuthentication authentication, IOptions<JsonSerializerOptions> jsonOptions, IOptions<AmadeusSettings> options) // todo add normal comments
         {
             _cache = cache;
             _httpClient = httpClient;
@@ -34,12 +34,18 @@ namespace RouteWise.Services
         {
             var cacheKey = CacheExtensions.GenerateCacheKey("FlightSearchV2", request);
 
+            // Retrieve the cached response if it exists
             return await _cache.GetOrCreateAsync(cacheKey, TimeSpan.FromMinutes(_cacheDurationMinutes), async () =>
             {
                 var token = await _authentication.GetOrRefreshAccessToken(cancellationToken);
 
+                // Generate the flight departure & return combination
                 var datePairs = BuildDatePairs(request);
+
+                // Find flight offers based off the configuration options
                 var collectedFlights = await CollectFlightOffersAsync(request.Origin, datePairs, token, request, cancellationToken);
+
+                // Format the response
                 var finalResponse = FormattedFlightOffersResponse.ConvertToSimpleOffersWithLayovers(new FlightSearchResponseV2 { Data = collectedFlights });
 
                 if (finalResponse.Flights.Count == 0)
@@ -70,11 +76,14 @@ namespace RouteWise.Services
 
         private async Task<List<FlightOffer>> CollectFlightOffersAsync(string origin, List<(string Departure, string? Return)> datePairs, string token, FlightSearchRequestV2 request, CancellationToken cancellationToken = default)
         {
-            var destinations = await BuildDestinationListAsync(origin, request.Destination, token, cancellationToken);
+            // If no destionation is provided, find all possible destionations
+            var destinations = string.IsNullOrWhiteSpace(request.Destination) 
+                ? await BuildDestinationListAsync(origin, token, cancellationToken) 
+                : [request.Destination];
 
             var collected = new List<FlightOffer>();
 
-            foreach (var dates in datePairs)
+            foreach (var (Departure, Return) in datePairs)
             {
                 if (collected.Count >= request.ResultLimit) break;
                 cancellationToken.ThrowIfCancellationRequested();
@@ -84,24 +93,33 @@ namespace RouteWise.Services
                     if (collected.Count >= request.ResultLimit) break;
                     cancellationToken.ThrowIfCancellationRequested();
 
+                    // Find the flight options for each destination
                     var flightOptions = await FetchFlightOptionsAsync(
                         origin,
+                        dest,
+                        Departure,
+                        Return,
                         token,
-                        request,
+                        request.Adults,
+                        request.Max,
+                        request.MaxPrice,
                         cancellationToken
                     );
 
                     if (flightOptions is null) continue;
 
                     List<FlightOffer> filtered;
+
+                    // If the request includes layover configuration, apply the filtering
                     if (request.Layovers.HasValue || request.MinLayoverDuration.HasValue)
                     {
-                        filtered = FilterFlights(flightOptions, request.MinLayoverDuration, request.Layovers);
+                        filtered = ApplyLayoverFilter(flightOptions, request.MinLayoverDuration, request.Layovers);
                     }
                     else
                     {
                         filtered = flightOptions.Data;
                     }
+                    // Only take the request result limit
                     int needed = request.ResultLimit - collected.Count;
                     collected.AddRange(filtered.Take(needed));
                 }
@@ -110,13 +128,8 @@ namespace RouteWise.Services
             return collected;
         }
 
-        private async Task<List<string>> BuildDestinationListAsync(string origin, string? destination, string token, CancellationToken cancellationToken = default)
+        private async Task<List<string>> BuildDestinationListAsync(string origin, string token, CancellationToken cancellationToken = default)
         {
-            if (!string.IsNullOrEmpty(destination))
-            {
-                return [destination];
-            }
-
             var allDestinations = await GetAvailableDestinationsAsync(origin, token, cancellationToken);
             if (allDestinations.Count == 0)
             {
@@ -126,7 +139,7 @@ namespace RouteWise.Services
             return allDestinations;
         }
 
-        private static List<FlightOffer> FilterFlights(
+        private static List<FlightOffer> ApplyLayoverFilter(
             FlightSearchResponseV2 response,
             int? minLayoverDuration,
             int? layovers
@@ -136,6 +149,7 @@ namespace RouteWise.Services
             {
                 foreach (var itinerary in flight.Itineraries)
                 {
+                    // Ensure the layover count matches the requested amount
                     if (layovers.HasValue)
                     {
                         int totalLayovers = itinerary.Segments.Count - 1;
@@ -143,14 +157,17 @@ namespace RouteWise.Services
                             return false;
                     }
 
+                    // Ensure the minimum layover duration matches the requested amount
                     if (minLayoverDuration.HasValue && itinerary.Segments.Count > 1)
                     {
                         bool allLayoversValid = true;
                         for (int i = 0; i < itinerary.Segments.Count - 1; i++)
                         {
+                            // Find the layover arrival and departure times
                             if (DateTime.TryParse(itinerary.Segments[i].Arrival.At, out DateTime arrival) &&
                                 DateTime.TryParse(itinerary.Segments[i + 1].Departure.At, out DateTime departure))
                             {
+                                // Calculate the layover duration
                                 double layoverMinutes = (departure - arrival).TotalMinutes;
                                 if (layoverMinutes < minLayoverDuration.Value)
                                 {
@@ -173,16 +190,24 @@ namespace RouteWise.Services
         }
 
         private async Task<FlightSearchResponseV2> FetchFlightOptionsAsync(
-            string origin, string token, FlightSearchRequestV2 request, CancellationToken cancellationToken = default)
+            string origin,
+            string destination,
+            string departureDate,
+            string? returnDate,
+            string token,
+            int adults,
+            int max,
+            int? maxPrice,
+            CancellationToken cancellationToken = default)
         {
             string cacheKey = CacheExtensions.GenerateCacheKey(
-                "FlightOffers", origin, request.Destination, request.DepartureDate, request.ReturnDate, request.Adults, request.Max, request.MaxPrice);
+                "FlightOffers", origin, destination, departureDate, returnDate, adults, max, maxPrice);
 
             return await _cache.GetOrCreateAsync(cacheKey, TimeSpan.FromMinutes(_cacheDurationMinutes), async () =>
             {
                 try
                 {
-                    var url = UrlBuilder.FlightOffers(origin, request.Destination, request.DepartureDate, request.ReturnDate, request.Adults, request.Max, request.MaxPrice);
+                    var url = Helpers.UriBuilder.FlightOffers(origin, destination, departureDate, returnDate, adults, max, maxPrice);
                     return await _httpClient.GetAsync<FlightSearchResponseV2>(url, token, _jsonOptions, cancellationToken);
 
                 }
@@ -197,9 +222,10 @@ namespace RouteWise.Services
         {
             string cacheKey = CacheExtensions.GenerateCacheKey("AvailableDestinations", origin);
 
-            return await _cache.GetOrCreateAsync(cacheKey, TimeSpan.FromHours(_cacheDurationMinutes), async () =>
+            // Retrieve the cached response if it exists
+            return await _cache.GetOrCreateAsync(cacheKey, TimeSpan.FromMinutes(_cacheDurationMinutes), async () =>
             {
-                var url = UrlBuilder.FligthDestinations(origin);
+                var url = Helpers.UriBuilder.FligthDestinations(origin);
                 return await _httpClient.GetAsync<List<string>>(url, token, _jsonOptions, cancellationToken);
             });
         }

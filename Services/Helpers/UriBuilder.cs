@@ -6,7 +6,7 @@ namespace RouteWise.Services.Helpers
     /// <summary>
     /// Provides methods for building Amedeus API URLs
     /// </summary>
-    public static class UrlBuilder
+    public static class UriBuilder
     {
         /// <summary>
         /// Builds a URL to fetch flight destinations.

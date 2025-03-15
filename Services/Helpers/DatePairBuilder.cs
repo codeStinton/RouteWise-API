@@ -47,6 +47,8 @@ namespace RouteWise.Services.Helpers
             DateTime startDate = new(request.Year!.Value, request.Month!.Value, 1);
             DateTime endDate = startDate.AddMonths(1).AddDays(-1);
 
+            // Find the required days of the week for the month
+            // For example, Find all combinations of departure: Friday, Return: Sunday
             for (DateTime d = startDate; d <= endDate; d = d.AddDays(1))
             {
                 if (d.DayOfWeek != request.DepartureDayOfWeek!.Value)
@@ -72,9 +74,12 @@ namespace RouteWise.Services.Helpers
         public static List<(string Departure, string? Return)> BuildDatePairsForYearAndMonth(FlightSearchRequestV2 request)
         {
             var pairs = new List<(string, string?)>();
+
+            // Find the start and end date of the requested month
             DateTime firstDay = new(request.Year!.Value, request.Month!.Value, 1);
             DateTime lastDay = firstDay.AddMonths(1).AddDays(-1);
 
+            // Find all the days within the month
             for (DateTime d = firstDay; d <= lastDay; d = d.AddDays(1))
             {
                 pairs.Add((d.ToString("yyyy-MM-dd"), null));
@@ -93,9 +98,12 @@ namespace RouteWise.Services.Helpers
         public static List<(string Departure, string? Return)> BuildDatePairsForDuration(int durationDays)
         {
             var pairs = new List<(string, string?)>();
+
+            // Find the start and end date a month from today
             DateTime now = DateTime.UtcNow.Date;
             DateTime end = now.AddMonths(1).AddDays(-1);
 
+            // Find all the days within the month duration
             for (var d = now; d < end; d = d.AddDays(1))
             {
                 pairs.Add((d.ToString("yyyy-MM-dd"), d.AddDays(durationDays).ToString("yyyy-MM-dd")));
@@ -112,6 +120,7 @@ namespace RouteWise.Services.Helpers
         /// </returns>
         public static List<(string Departure, string? Return)> BuildDefaultDatePairs()
         {
+            // Default duration returned is one week
             DateTime defaultDep = DateTime.UtcNow.AddDays(7);
             DateTime defaultRet = defaultDep.AddDays(7);
             return new List<(string, string?)> { (defaultDep.ToString("yyyy-MM-dd"), defaultRet.ToString("yyyy-MM-dd")) };
