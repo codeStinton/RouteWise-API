@@ -20,7 +20,7 @@ namespace RouteWise.Services
         private readonly IAuthentication _authentication;
         private readonly JsonSerializerOptions _jsonOptions;
 
-        public FlightSearchServiceV2(IMemoryCache cache, HttpClient httpClient, IAuthentication authentication, IOptions<JsonSerializerOptions> jsonOptions, IOptions<AmadeusSettings> options) // todo add normal comments
+        public FlightSearchServiceV2(IMemoryCache cache, HttpClient httpClient, IAuthentication authentication, IOptions<JsonSerializerOptions> jsonOptions, IOptions<AmadeusSettings> options)
         {
             _cache = cache;
             _httpClient = httpClient;
