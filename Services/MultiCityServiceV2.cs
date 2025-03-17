@@ -20,7 +20,7 @@ namespace RouteWise.Services
         private readonly JsonSerializerOptions _jsonOptions;
         private readonly int _cacheDurationMinutes;
 
-        public MultiCityServiceV2(MemoryCache cache, HttpClient httpClient, IAuthentication authentication, IOptions<JsonSerializerOptions> jsonOptions, IOptions<AmadeusSettings> options)
+        public MultiCityServiceV2(IMemoryCache cache, HttpClient httpClient, IAuthentication authentication, IOptions<JsonSerializerOptions> jsonOptions, IOptions<AmadeusSettings> options)
         {
             _cache = cache;
             _httpClient = httpClient;

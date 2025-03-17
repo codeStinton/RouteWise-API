@@ -9,6 +9,7 @@ using RouteWise.Caching;
 using CacheExtensions = RouteWise.Caching.CacheExtensions;
 using RouteWise.Services.Helpers;
 using RouteWise.Exceptions;
+using RouteWise.Models.Amadeus.V1;
 
 namespace RouteWise.Services
 {
@@ -77,9 +78,17 @@ namespace RouteWise.Services
         private async Task<List<FlightOffer>> CollectFlightOffersAsync(string origin, List<(string Departure, string? Return)> datePairs, string token, FlightSearchRequestV2 request, CancellationToken cancellationToken = default)
         {
             // If no destionation is provided, find all possible destionations
-            var destinations = string.IsNullOrWhiteSpace(request.Destination) 
-                ? await BuildDestinationListAsync(origin, token, cancellationToken) 
-                : [request.Destination];
+            List<string> destinations;
+
+            if (!string.IsNullOrWhiteSpace(request.Destination))
+            {
+                destinations = [request.Destination];
+            }
+            else
+            {
+                var flightDestinationsResponse = await BuildDestinationListAsync(origin, token, cancellationToken);
+                destinations = flightDestinationsResponse.Data.Select(d => d.Destination).ToList();
+            }
 
             var collected = new List<FlightOffer>();
 
@@ -128,10 +137,10 @@ namespace RouteWise.Services
             return collected;
         }
 
-        private async Task<List<string>> BuildDestinationListAsync(string origin, string token, CancellationToken cancellationToken = default)
+        private async Task<FlightSearchResponseV1> BuildDestinationListAsync(string origin, string token, CancellationToken cancellationToken = default)
         {
             var allDestinations = await GetAvailableDestinationsAsync(origin, token, cancellationToken);
-            if (allDestinations.Count == 0)
+            if (allDestinations is null)
             {
                 throw new FlightSearchException($"No available destinations found for origin: {origin}");
             }
@@ -218,7 +227,7 @@ namespace RouteWise.Services
             });
         }
 
-        private async Task<List<string>> GetAvailableDestinationsAsync(string origin, string token, CancellationToken cancellationToken = default)
+        private async Task<FlightSearchResponseV1> GetAvailableDestinationsAsync(string origin, string token, CancellationToken cancellationToken = default)
         {
             string cacheKey = CacheExtensions.GenerateCacheKey("AvailableDestinations", origin);
 
@@ -226,7 +235,7 @@ namespace RouteWise.Services
             return await _cache.GetOrCreateAsync(cacheKey, TimeSpan.FromMinutes(_cacheDurationMinutes), async () =>
             {
                 var url = Helpers.UriBuilder.FligthDestinations(origin);
-                return await _httpClient.GetAsync<List<string>>(url, token, _jsonOptions, cancellationToken);
+                return await _httpClient.GetAsync<FlightSearchResponseV1>(url, token, _jsonOptions, cancellationToken);
             });
         }
     }
