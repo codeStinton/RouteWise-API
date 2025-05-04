@@ -43,3 +43,5 @@ RouteWise is a highly customizable flight search API that integrates with [Amade
 - ASP.NET Core
 
 - Amadeus API
+
+- Swagger
