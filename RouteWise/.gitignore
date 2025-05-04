@@ -1,0 +1,8 @@
+/.vs
+/bin
+/obj
+credentials.txt
+TODOs.txt
+.gitattributes
+RouteWise.csproj.user
+Properties/launchSettings.json
