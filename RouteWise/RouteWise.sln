@@ -5,7 +5,7 @@ VisualStudioVersion = 17.12.35707.178
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RouteWise", "RouteWise.csproj", "{9595D4FF-E871-4414-A8D3-15E1E13704F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RouteWiseTests", "..\RouteWiseTests\RouteWiseTests.csproj", "{B77C4581-DAA9-4407-840F-8E28632BD17A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RouteWise.Tests", "..\RouteWise.Tests\RouteWise.Tests.csproj", "{40FCB780-51AB-477C-B780-A0AC1332F1C9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{9595D4FF-E871-4414-A8D3-15E1E13704F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9595D4FF-E871-4414-A8D3-15E1E13704F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9595D4FF-E871-4414-A8D3-15E1E13704F8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B77C4581-DAA9-4407-840F-8E28632BD17A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B77C4581-DAA9-4407-840F-8E28632BD17A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B77C4581-DAA9-4407-840F-8E28632BD17A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B77C4581-DAA9-4407-840F-8E28632BD17A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{40FCB780-51AB-477C-B780-A0AC1332F1C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40FCB780-51AB-477C-B780-A0AC1332F1C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40FCB780-51AB-477C-B780-A0AC1332F1C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40FCB780-51AB-477C-B780-A0AC1332F1C9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
