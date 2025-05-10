@@ -7,7 +7,7 @@ using RouteWise.Models.Amadeus.V1;
 using RouteWise.Models.Amadeus.V2;
 using RouteWise.Services.Interfaces;
 
-namespace RouteWise.Tests
+namespace RouteWise.Tests.ControllerTests
 {
     [TestClass]
     public class FlightSearchControllerTests
@@ -132,14 +132,14 @@ namespace RouteWise.Tests
             // Arrange
             var request = new MultiCitySearchRequestV2
             {
-                OriginDestinations = new List<OriginDestinationDto>
-                {
+                OriginDestinations =
+                [
                     new OriginDestinationDto
                     {
                         DestinationLocationCode = "PAR",
                         OriginLocationCode = "LDN"
                     }
-                }
+                ]
             };
 
             var expected = new FlightSearchResponseV2();
