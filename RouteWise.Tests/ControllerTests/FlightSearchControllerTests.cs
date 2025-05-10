@@ -114,7 +114,6 @@ namespace RouteWise.Tests.ControllerTests
         [TestMethod]
         public async Task MultiCitySearch_EmptyOriginDestinations_ReturnsBadRequest()
         {
-            // Arrange
             var request = new MultiCitySearchRequestV2 { OriginDestinations = [] };
 
             var result = await _flightSearchControllerMock.MultiCitySearch(request, CancellationToken.None);
@@ -129,7 +128,6 @@ namespace RouteWise.Tests.ControllerTests
         [TestMethod]
         public async Task MultiCitySearch_ValidRequest_ReturnsOk()
         {
-            // Arrange
             var request = new MultiCitySearchRequestV2
             {
                 OriginDestinations =
