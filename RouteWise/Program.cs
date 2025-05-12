@@ -5,6 +5,13 @@ using RouteWise.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(5000);
+    options.ListenAnyIP(5001, listenOptions =>
+        listenOptions.UseHttps());
+});
+
 builder.Services.Configure<AmadeusSettings>(builder.Configuration.GetSection("Amadeus"));
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpClient<IAuthentication, Authentication>();
