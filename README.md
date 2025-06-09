@@ -6,7 +6,8 @@ RouteWise is a modern, responsive flight search application that helps users fin
 
 ## 🛠️ Tech Stack
 
-- **Framework**: ASP.NET Core 8.0
+- **Platform**: .NET 8  
+- **Framework**: ASP.NET Core
 - **Language**: C#
 - **API Integration**: [Amadeus Travel API ](https://developers.amadeus.com/)
 - **Documentation**: Swagger
