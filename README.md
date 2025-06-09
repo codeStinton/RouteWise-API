@@ -2,7 +2,7 @@
 
 RouteWise-API is a robust backend service that provides comprehensive flight search functionality. It integrates with the Amadeus API to offer flexible date searches, multi-city routing, and advanced filtering capabilities.
 
-**This is the backend API.** For the frontend application, please visit: [RouteWise Frontend](https://github.com/codeStinton/RouteWise-UI)
+**This is the backend API.** For the frontend application, please visit: [RouteWise Frontend](https://github.com/codeStinton/RouteWise-UI)**
 
 ## ✨ Features
 
