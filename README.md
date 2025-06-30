@@ -20,7 +20,7 @@ RouteWise is a modern, responsive flight search application that helps users fin
 - 📅 **Flexible Dates** - Search by specific dates, flexible months, days of week, or trip duration
 - 🌍 **Multi-City Support** - Plan complex itineraries with multiple destinations
 - 💰 **Price Filtering** - Set maximum budget constraints
-- ⏱️ **Layover Preferences** - Control minimum/maximum layover times
+- ⏱️ **Layover Preferences** - Control minimum/maximum layover times and locations
 
 ### Search Options
 - **One-way, Round-trip, and Multi-city** flights
